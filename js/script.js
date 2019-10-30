@@ -1,4 +1,8 @@
 var Counter = React.createClass({
+	propTypes: {
+		number: React.PropTypes.number.isRequired
+	},
+
 	getDefaultProps: function(){
 		console.log('Ustawianie domyślnych wartości propsów (które nie zostały przekazane do komponentu');
 	},
@@ -10,6 +14,18 @@ var Counter = React.createClass({
 		};
 	},
 
+	increment: function(){
+		this.setState({
+			counter: this.state.counter + 1
+		});
+	},
+
+	decrement: function(){
+		this.setState({
+			counter: this.state.counter - 1
+		});
+	},
+
 	componentWillMount: function(){
 		console.log('Metoda wywoływana przed wykonaniem metody render. Ustawienie stanu w tej metodzie nie spowoduje przerenderowania komponentu');
 	},
@@ -17,15 +33,15 @@ var Counter = React.createClass({
 	render: function(){
 		console.log('Zwraca ReactElement')
 		return React.createElement('div', {},
-			React.createElement('span', {}, 'Licznik'),
-			React.createElement('button', {onClick: this.increment}, '+'),
-			React.createElement('button', {onClick: this.decrement}, '-'),
-			this.state.counter
+			React.createElement('span', {}, "Licznik nr " + this.props.number + ": "),
+			React.createElement('span', {}, this.state.counter),
+			React.createElement('button', {onClick: this.increment, className: "button"}, '+'),
+			React.createElement('button', {onClick: this.decrement, className: "button"}, '-'),
 			);	
 	},
 
 	componentDidMount: function(){
-		console.log('Metoda wywoływana po wywołaniu metody render. W chwili wykonywania tej metody komponent już widnieje na stronie. Można wykonywać różnego rodzaju operacje maninpulacji, używać jQuery czy pobrać dane');
+		console.log('Metoda jest wywoływana po bezpośrednio po zamontowaniu komponentu. Jeśli potrzebujesz załadować dane ze zdalnego zasobu, jest to dobre miejsce do wykonania zapytania sieciowego');
 	},
 
 	conponentWillReceiveProps: function(){
@@ -48,21 +64,23 @@ var Counter = React.createClass({
 	componentWillUnmount: function(){
 		console.log('Metoda "sprzatajaca-konczaca życie komponentu". wykonać można w niej wszystkie rzeczy zwiazane w odpinaniem timerów czy nasłuchiwaniem zdarzen na elementach DOM');
 	},
-
-	increment: function(){
-		this.setState({
-			counter: this.state.counter + 1
-		});
-	},
-
-	decrement: function(){
-		this.setState({
-			counter: this.state.counter - 1
-		});
-	}
-
 	
 });
 
-var element = React.createElement(Counter);
+var CounterList = React.createClass({
+	propTypes: {
+		countersNumber: React.PropTypes.array.isRequired
+	},
+	render: function(){
+		var counterList = this.props.countersNumber.map(function(counter){
+			return React.createElement(Counter, {key: counter, number: counter });
+		});
+		return React.createElement('div', {}, counterList);
+	}
+
+});
+
+var countersNumber = [1, 2, 3, 4];
+
+var element = React.createElement(CounterList, {countersNumber: countersNumber});
 ReactDOM.render(element, document.getElementById('app'));
